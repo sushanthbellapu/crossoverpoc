@@ -880,7 +880,7 @@
 
         "AWS::CloudFormation::Init" : {
           "config" : {
-
+	    "packages" : {
               "yum" : {
                 "httpd"            : [],
                 "php"              : [],
@@ -890,12 +890,12 @@
               }
             },
 
-	  "sources" : {
-              “/usr/local/share/mybb“ : "https://github.com/sushanthbellapu/crossoverpoc/archive/master.tar.gz"
+	    "sources" : {
+              "/usr/local/share" : "https://codeload.github.com/sushanthbellapu/crossoverpoc/legacy.tar.gz/master"
             },
 
             "files" : {
-              "/usr/local/share/mybb/crossoverpoc-master.tar.gz” : {
+              "/usr/local/share/crossoverpoc-master.tar.gz" : {
                 "mode"   : "000644",
                 "owner"  : "root",
                 "group"  : "root"
@@ -1027,15 +1027,15 @@
 
             "commands" : {
               "00) Unpack 'crossoverpoc-master.tar.gz' file into same directory" : {
-                "command" : "tar xf /usr/local/share/mybb/crossoverpoc-master.tar.gz  -C /usr/local/share/mybb --strip 1"
+                "command" : "tar xf /usr/local/share/crossoverpoc-master.tar.gz  -C /usr/local/share/mybb --strip 1"
               },
 
 	      "01) Copy source contents to /var/www/html" : {
-		"command" : "cp -r /usr/local/share/mybb/crossoverpoc-master/mybbsource/* /var/www/html/"
+		"command" : "cp -r /usr/local/share/crossoverpoc-master/mybbsource/* /var/www/html/"
 	      },
 
 	      "02) Copy Configured files to /var/www/html" : {
-		"command" : "sudo cp -r /usr/local/share/mybb/crossoverpoc-master/mybb-www-config/* /var/www/html/"
+		"command" : "sudo cp -r /usr/local/share/crossoverpoc-master/mybb-www-config/* /var/www/html/"
 	      },
 
               "03) Set 'apache' user and group as mybb directory owners" : {
@@ -1097,7 +1097,7 @@
                   " -e 'SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = \"", { "Ref": "DBName" }, "\";'",
                   " | awk '{print $1}' | tail -1);",
                   " if [ ${count} -eq 0 ]; then",
-                  " cp /usr/local/share/mybb/crossoverpoc-master/mybb-db-config/mysql/mybb-dump.sql /tmp;",
+                  " cp /usr/local/share/crossoverpoc-master/mybb-db-config/mysql/mybb-dump.sql /tmp;",
                   " sed -i 's/ENDPOINT_URL/", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}, "/g' /tmp/mybb-dump.sql;",
                   " mysql",
                   " -h", { "Fn::GetAtt": [ "MySQLDatabase", "Endpoint.Address" ] },
