@@ -5,21 +5,21 @@
 
   "Parameters": {
 
-    "ParDBName": {
+    "DBName": {
       "Type": "String",
       "Description": "The DB Name of the RDS instance",
       "ConstraintDescription": "must contain only alphanumeric characters",
       "Default": "mybbdb"
     },
 
-    "ParDBUser": {
+    "DBUser": {
       "Type": "String",
       "Description": "The name of master user for the client DB Instance.",
       "ConstraintDescription": "must begin with a letter and contain only alphanumeric characters",
       "Default": "mybbadmin"
     },
 
-    "ParDBPassword" : {
+    "DBPassword" : {
       "Type" : "String",
       "Description": "The master password for the DB instance.",
       "ConstraintDescription": "must contain only alphanumeric characters",
@@ -29,7 +29,7 @@
       "NoEcho" : "true"
     },
 
-    "ParEC2InstanceType": {
+    "EC2InstanceType": {
       "Type": "String",
       "Description": "WebServer EC2 instance type",
       "ConstraintDescription": "must be a valid EC2 instance type.",
@@ -43,7 +43,7 @@
       "Default": "t2.micro"
     },
 
-    "ParEC2InstanceCapacity": {
+    "EC2InstanceCapacity": {
       "Type": "Number",
       "Description" : "The initial nuber of EC2 instances",
       "ConstraintDescription" : "must be between 1 and 5 EC2 instances.",
@@ -52,7 +52,7 @@
       "Default": "2"
     },
 
-    "ParDBInstanceClass": {
+    "DBInstanceClass": {
       "Type": "String",
       "Description" : "The database instance type",
       "ConstraintDescription" : "must select a valid database instance type.",
@@ -65,7 +65,7 @@
       "Default": "db.t2.small"
     },
 
-    "ParDBAllocatedStorage": {
+    "DBAllocatedStorage": {
       "Type": "Number",
       "Description" : "The size of the database (Gb)",
       "ConstraintDescription" : "must be between 5 and 1024Gb.",
@@ -74,7 +74,7 @@
       "Default": "5"
     },
 
-    "ParElasticacheNodeType": {
+    "ElasticacheNodeType": {
       "Type": "String",
       "Description": "Elasticache node type",
       "ConstraintDescription": "must be a valid Elasticache node type.",
@@ -88,28 +88,28 @@
       "Default": "cache.t2.micro"
     },
 
-    "ParKeyName": {
+    "KeyName": {
       "Type": "AWS::EC2::KeyPair::KeyName",
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "ConstraintDescription": "must be the name of an existing EC2 KeyPair.",
       "MinLength" : "1"
     },
 
-    "ParCorporateCidrIp" : {
+    "CorporateCidrIp" : {
       "Type" : "String",
       "Description" : "Your Company's CidrIp (to restrict traffic to be authorized ONLY from corporate office)",
       "ConstraintDescription": "must be a CIDR or an IP address.",
       "Default" :  "0.0.0.0/0"
     },
 
-    "ParAdminEmail": {
+    "AdminEmail": {
       "Type": "String",
       "Description": "Email address to notify if there are any scaling operations",
       "ConstraintDescription": "must be a valid email address.",
       "AllowedPattern": "([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)"
     },
 
-    "ParAdminPassword" : {
+    "AdminPassword" : {
       "Type" : "String",
       "Description": "The admin password for the myBB forum management.",
       "ConstraintDescription": "must contain only alphanumeric characters",
@@ -534,8 +534,8 @@
         "GroupDescription" : "Bastion access from Corporate Network",
         "VpcId" : {"Ref" : "VPC"},
         "SecurityGroupIngress" : [ 
-          { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "ParCorporateCidrIp" } },
-          { "IpProtocol" : "icmp", "FromPort" : "-1", "ToPort" : "-1", "CidrIp" : { "Ref" : "ParCorporateCidrIp" } }
+          { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "CorporateCidrIp" } },
+          { "IpProtocol" : "icmp", "FromPort" : "-1", "ToPort" : "-1", "CidrIp" : { "Ref" : "CorporateCidrIp" } }
         ],
         "Tags" : [
           { "Key": "Name", "Value": "BastionSG"}
@@ -585,7 +585,7 @@
           }]
         },
         "InstanceType" : "t2.micro",
-        "KeyName" : { "Ref": "ParKeyName" },
+        "KeyName" : { "Ref": "KeyName" },
         "Monitoring" : "false",
         "SecurityGroupIds" : [ { "Ref": "BastionSecurityGroup" } ],
         "SubnetId" : { "Ref": "PublicSubnet1" },
@@ -617,7 +617,7 @@
         "AutoMinorVersionUpgrade": "true",
         "AZMode" : "cross-az",
         "Engine": "memcached",
-        "CacheNodeType": { "Ref": "ParElasticacheNodeType" },
+        "CacheNodeType": { "Ref": "ElasticacheNodeType" },
 		"NotificationTopicArn": { "Ref": "AdminSNSTopic" },
         "NumCacheNodes": "2",
 		"CacheSubnetGroupName": { "Ref": "ElasticacheSubnetGroup" },
@@ -683,20 +683,20 @@
       }
     },
 
-    "Database": {
+    "MySQLDatabase": {
       "Type": "AWS::RDS::DBInstance",
       "DeletionPolicy": "Snapshot",
       "Properties": {
-        "MasterUserPassword": { "Ref": "ParDBPassword" },
+        "MasterUserPassword": { "Ref": "DBPassword" },
         "EngineVersion": "5.6.27",
-        "DBInstanceClass": { "Ref": "ParDBInstanceClass" },
+        "DBInstanceClass": { "Ref": "DBInstanceClass" },
         "DBSecurityGroups": [ { "Ref": "DatabaseSecurityGroup" } ],
-        "MasterUsername": { "Ref": "ParDBUser" },
-        "DBName": { "Ref": "ParDBName" },
+        "MasterUsername": { "Ref": "DBUser" },
+        "DBName": { "Ref": "DBName" },
         "DBSubnetGroupName": { "Ref": "DatabaseSubnetGroup" },
         "MultiAZ": "true",
         "Engine": "mysql",
-        "AllocatedStorage": { "Ref": "ParDBAllocatedStorage" },
+        "AllocatedStorage": { "Ref": "DBAllocatedStorage" },
         "Tags" : [
           { "Key": "Name", "Value": "myBBDatabase"}
         ]
@@ -947,7 +947,7 @@
 
               "12) Fill URL occurences into 'settings.php'" : {
                 "command" : { "Fn::Join" : [ "", [
-                  "sed -i -e 's/URL/", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}, "/g' /var/www/html/inc/settings.php"
+                  "sed -i -e 's/URL/", { "Fn::GetAtt" : [ "LoadBalancer", "DNSName" ]}, "/g' /var/www/html/inc/settings.php"
                 ]]}
               },
 
@@ -961,7 +961,7 @@
                   " | awk '{print $1}' | tail -1);",
                   " if [ ${count} -eq 0 ]; then",
                   " cp /usr/local/share/sushanthbellapu-crossoverpoc-7bac4b3/mybb-db-config/mysql/mybb-dump.sql /tmp;",
-                  " sed -i 's/ENDPOINT_URL/", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}, "/g' /tmp/mybb-dump.sql;",
+                  " sed -i 's/ENDPOINT_URL/", { "Fn::GetAtt" : [ "LoadBalancer", "DNSName" ]}, "/g' /tmp/mybb-dump.sql;",
                   " mysql",
                   " -h", { "Fn::GetAtt": [ "MySQLDatabase", "Endpoint.Address" ] },
                   " -u", { "Ref": "DBUser" },
@@ -1011,13 +1011,13 @@
             "Ref": "AWS::Region"
           }, {
             "Fn::FindInMap": ["MapAWSInstanceType2Arch", {
-              "Ref": "ParEC2InstanceType"
+              "Ref": "EC2InstanceType"
             }, "Arch"]
           }]
         },
         "InstanceMonitoring": true,
-        "InstanceType": { "Ref": "ParEC2InstanceType" },
-        "KeyName": { "Ref" : "ParKeyName" },
+        "InstanceType": { "Ref": "EC2InstanceType" },
+        "KeyName": { "Ref" : "KeyName" },
         "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
             "#!/bin/bash -xe\n",
             "yum update -y aws-cfn-bootstrap\n",
@@ -1066,7 +1066,7 @@
 
       "Properties": {
         "LoadBalancerNames": [ { "Ref": "LoadBalancer" } ],
-        "MinSize": { "Ref": "ParEC2InstanceCapacity" },
+        "MinSize": { "Ref": "EC2InstanceCapacity" },
         "LaunchConfigurationName": { "Ref": "AutoScalingLaunchConfiguration" },
         "AvailabilityZones": [ { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] }, { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] } ],
         "Cooldown": "360",
@@ -1159,7 +1159,7 @@
       "Type" : "AWS::SNS::Topic",
       "Properties" : {
         "Subscription" : [
-          { "Endpoint" : { "Ref" : "ParAdminEmail" }, "Protocol" : "email" }
+          { "Endpoint" : { "Ref" : "AdminEmail" }, "Protocol" : "email" }
         ],
         "TopicName" : "SampleTopic"
       }
@@ -1218,7 +1218,12 @@
         ]
       }
     },
-
+    "CloudFormationLogs": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "RetentionInDays": 7
+      }
+    },
     "WebServerLogRoleInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
@@ -1242,7 +1247,7 @@
       "Description": "The Elastic Load Balancer URL of the website"
     },
     "DatabaseProperties": {
-      "Value": { "Fn::Join": [ ",", [ { "Ref": "Database" }, { "Fn::GetAtt": [ "Database", "Endpoint.Address" ] }, { "Fn::GetAtt": [ "Database", "Endpoint.Port" ] } ] ] },
+      "Value": { "Fn::Join": [ ",", [ { "Ref": "MySQLDatabase" }, { "Fn::GetAtt": [ "MySQLDatabase", "Endpoint.Address" ] }, { "Fn::GetAtt": [ "MySQLDatabase", "Endpoint.Port" ] } ] ] },
       "Description": "Properties associated with the RDS database instance"
     }
   }
